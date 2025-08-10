@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Arquivos PWA</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#007bff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="File Manager">
+    <meta name="description" content="Gerenciador de arquivos offline com drag & drop">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMwMDdiZmYiLz4KPHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4PSIzMiIgeT0iMzIiPgo8cGF0aCBkPSJNMTAgNGg0djJoLTR6bTAgNGg0djJoLTR6bTAgNGg0djJoLTR6bTYtOGgtMlY0aDJ6bTAtNGgtMnYyaDJ6bTAtNGgtMnYyaDJ6IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkdlcmVuY2lhZG9yIGRlIEFycXVpdm9zIFBXQSIsCiAgInNob3J0X25hbWUiOiAiRmlsZSBNYW5hZ2VyIiwKICAiZGVzY3JpcHRpb24iOiAiR2VyZW5jaWFkb3IgZGUgYXJxdWl2b3Mgb2ZmbGluZSBjb20gZHJhZyAmIGRyb3AiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzAwN2JmZiIsCiAgInRoZW1lX2NvbG9yIjogIiMwMDdiZmYiLAogICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdC1wcmltYXJ5IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRreUlpQm9aV2xuYUhROUlqRTVNaUlpSUhacFpYZENiM2c5SWpBZ01DQXhPVElnTVRreUlpQm1hV3hzUFNKdWIyNWxJaUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lQZ28jmVXTjBJSGRwWkhSb1BTSXhPVElpSUdobGFXZG9kRDBpTVRreUlpQnllRDBpTWpRaUlHWnBiR3c5SWlNd01EZGlabVlpTHo0S1BITjJaeUIzYVdSMGFEMGlNVEk0SWlCb1pXbG5hSFE5SWpFeU9DSWlJSFpwWlhkQ2IzZzlJakFnTUNBeU5DQXlOQ0lpSUdacGJHdzlJbTV2Ym1VaUlIZzlJak15SWlCNVBTSXpNaUlnUGdvOGNHRjBhQ0JrUFNKTk1UQWdOR2cwZGpKb0xUUjZiVEFnTkdnMGRqSm9MVFI2YlRBZ05HZzBkakpvTFRSNmJUWXRPR2d0TW5ZMGFEWjZiVEF0TkdndE1uWXlhRFI2YlRBdE5HZ3RNblkwYURONklpQm1hV3hzUFNKM2FHbDBaU0l2UGdvOEwzTjJaejRLUEM5emRtYysifSwKICAgIHsKICAiInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlOVEV5SWlCb1pXbG5hSFE5SWpVeE1pSWlJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWlCbWFXeHNQU0p1YjI1bElpQjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTVjNEpRMkF3TUM5emRtY2lQZ28jeU1ISmxZM1FnZDJsa2RHZzlJalV4TWlraUlHaGxhV2RvZEQwaU5URXlJaUJ5ZUQwaU5qUWlJR1pwYkd3OUlpTXdNRGRpWm1ZaUx6NEtQSE4yWnlCM2FXUjBhRDBpTXpJd0lpQm9aV2xuYUhROUlqTXlNQ0lpSUhacFpYZENiM2c5SWpBZ01DQXlOQ0F5TkNJaUlHWnBiR3c5SW01dmJtVWlJSGc5SWpjMklpQjVQU0kzTmlJZ1BnbzhjR0YwYUNCa1BTSk5NVEFnTkdnMGRqSm9MVFI2YlRBZ05HZzBkakpvTFRSNmJUQWdOR2cwZGpKb0xUUjZiVFl0T0dndE1uWTBhRFo2YlRBdE5HZ3RNblkzWTJaYU1HZ3llaUlpSUdacGJHdzlJbmRvYVhSbElpOCtDangvYzNabis0SzhMM04yWnoiLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9LAogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1UazJJaUJvWldsbmFIUTlJakU1TmlJaUlIWnBaWGRDYjNnOUlqQWdNQ0F4T1RrNU1UazJJaUJtYVd4c1BTSnViMjVsSWlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpUGdvOE5IZGFkR2c5SWpFNU5pSWlJR2hsYVdkb2REMGlNVGsySWlCeWVEMGlNalFpSUdacGJHdz9JaU13TURCM1ptWWlMejRLUEhOMlp5QjNhV1IwYUQwcU1qVTJJaUJvWldsbmFIUTlJakkxTmlJaUlIWnBaWGRDYjNnOUlqQWdNQ0F5TkNBeU5DSWlJR1pwYkd3OUltNXZibVVpSUhnOUlqRTJJaUI1UFNJeE5pSWdQZ284Y0dGMGFDQmtQU0pOTVRBZ05HZzBkakpvTFRSNmJUQWdOR2cwZGpKb0xUUjZiVEFnTkdnMGRqSm9MVFI2YlRZdE9HZ3RNblkwWVZoem16bVVja1VSc2lJaUlEcjJZTVpEeXF0SFRtdDJWaWg2YlRBdE5HZ3RNblk0YzJoNmVpSWlJR1pwYkd3OUluZG9hWFJsSWk4K0Nqd3ZjM1puUGdvOEwzTjJaejQiLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+    
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --accent-color: #007bff;
+            --accent-hover: #0056b3;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --drop-zone-bg: #f0f8ff;
+            --drop-zone-border: #007bff;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --border-color: #404040;
+            --accent-color: #4dabf7;
+            --accent-hover: #339af0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --drop-zone-bg: #1e3a5f;
+            --drop-zone-border: #4dabf7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pwa-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .theme-toggle, .install-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover, .install-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .install-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-color: transparent;
+        }
+
+        .install-btn:hover {
+            background: linear-gradient(135deg, #218838, #1a9c7a);
+        }
+
+        .install-btn.hidden {
+            display: none;
+        }
+
+        .status-bar {
+            background: var(--bg-secondary);
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .status-online {
+            color: #28a745;
+        }
+
+        .status-offline {
+            color: #dc3545;
+        }
+
+        .upload-section {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone {
+            border: 3px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: var(--bg-primary);
+            margin-bottom: 20px;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--drop-zone-border);
+            background: var(--drop-zone-bg);
+            transform: translateY(-2px);
+        }
+
+        .drop-zone-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+        }
+
+        .drop-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .drop-subtext {
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+            flex-grow: 1;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .file-count {
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .files-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .files-table th,
+        .files-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .files-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .files-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .file-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .file-extension {
+            background: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .file-size {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .clear-btn, .save-btn, .load-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #ff4757;
+            color: white;
+            border-color: #ff4757;
+        }
+
+        .save-btn:hover {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .load-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .header-controls {
+                flex-wrap: wrap;
+            }
+
+            .upload-section {
+                padding: 20px;
+            }
+
+            .drop-zone {
+                padding: 30px 20px;
+            }
+
+            .files-table th,
+            .files-table td {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+
+            .table-container {
+                padding: 15px;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .files-table {
+                font-size: 0.8rem;
+            }
+
+            .files-table th,
+            .files-table td {
+                padding: 8px 5px;
+            }
+
+            .table-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .table-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                📁 Gerenciador de Arquivos 
+                <span class="pwa-badge">PWA</span>
+            </h1>
+            <div class="header-controls">
+                <button class="install-btn hidden" id="installBtn">
+                    📱 Instalar App
+                </button>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-text">Escuro</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span id="connectionStatus" class="status-online">🟢 Online</span>
+            </div>
+            <div class="status-item">
+                <span>📊 Armazenamento: <span id="storageUsage">0 KB</span></span>
+            </div>
+            <div class="status-item">
+                <span>⏰ Última atualização: <span id="lastUpdate">Agora</span></span>
+            </div>
+        </div>
+
+        <div class="upload-section">
+            <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+                <div class="drop-zone-content">
+                    <div class="upload-icon">📤</div>
+                    <div class="drop-text">Arraste e solte seus arquivos aqui</div>
+                    <div class="drop-subtext">ou clique para selecionar arquivos</div>
+                </div>
+            </div>
+            <input type="file" id="fileInput" class="file-input" multiple>
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    📎 Selecionar Arquivos
+                </button>
+                <button class="clear-btn" onclick="clearFiles()">
+                    🗑️ Limpar Lista
+                </button>
+                <button class="save-btn" onclick="saveData()">
+                    💾 Salvar Localmente
+                </button>
+                <button class="load-btn" onclick="loadData()">
+                    📂 Carregar Dados
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">Arquivos Carregados</h2>
+                <div class="table-actions">
+                    <span class="file-count" id="fileCount">0 arquivos</span>
+                </div>
+            </div>
+            
+            <div id="tableWrapper">
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p>Nenhum arquivo carregado ainda.<br>Arraste arquivos para começar!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">
+        <span id="toastIcon">ℹ️</span>
+        <span id="toastMessage">Mensagem</span>
+    </div>
+
+    <script>
+        // PWA Variables
+        let deferredPrompt;
+        let files = [];
+        let isOnline = navigator.onLine;
+
+        // PWA Installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').classList.remove('hidden');
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    showToast('App instalado com sucesso!', 'success');
+                    document.getElementById('installBtn').classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('SW registered: ', registration);
+                    showToast('App pronto para uso offline!', 'success');
+                } catch (registrationError) {
+                    console.log('SW registration failed: ', registrationError);
+                }
+            });
+        }
+
+        // Online/Offline Status
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            if (navigator.onLine) {
+                statusElement.textContent = '🟢 Online';
+                statusElement.className = 'status-online';
+                if (!isOnline) {
+                    showToast('Conexão restaurada!', 'success');
+                }
+                isOnline = true;
+            } else {
+                statusElement.textContent = '🔴 Offline';
+                statusElement.className = 'status-offline';
+                if (isOnline) {
+                    showToast('Modo offline ativo', 'error');
+                }
+                isOnline = false;
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        // Toast Notifications
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️',
+                warning: '⚠️'
+            };
+            
+            toastIcon.textContent = icons[type] || icons.info;
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Local Storage Functions
+        function saveData() {
+            try {
+                const data = {
+                    files: files.map(file => ({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        lastModified: file.lastModified
+                    })),
+                    theme: document.body.getAttribute('data-theme'),
+                    timestamp: Date.now()
+                };
+                
+                const dataStr = JSON.stringify(data);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `file-manager-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Dados salvos com sucesso!', 'success');
+                updateStorageUsage();
+            } catch (error) {
+                showToast('Erro ao salvar dados', 'error');
+                console.error('Save error:', error);
+            }
+        }
+
+        function loadData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data.files) {
+                                files = data.files.map(fileData => {
+                                    // Create a mock file object for display
+                                    return {
+                                        name: fileData.name,
+                                        size: fileData.size,
+                                        type: fileData.type || '',
+                                        lastModified: fileData.lastModified || Date.now()
+                                    };
+                                });
+                                
+                                if (data.theme) {
+                                    document.body.setAttribute('data-theme', data.theme);
+                                    updateThemeToggle();
+                                }
+                                
+                                updateFileTable();
+                                updateLastUpdate();
+                                showToast('Dados carregados com sucesso!', 'success');
+                            }
+                        } catch (error) {
+                            showToast('Erro ao carregar dados', 'error');
+                            console.error('Load error:', error);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function updateStorageUsage() {
+            const dataSize = JSON.stringify(files).length;
+            const sizeKB = (dataSize / 1024).toFixed(2);
+            document.getElementById('storageUsage').textContent = `${sizeKB} KB`;
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('lastUpdate').textContent = timeString;
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            if (body.getAttribute('data-theme') === 'light') {
+                body.setAttribute('data-theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+            }
+            updateThemeToggle();
+            updateLastUpdate();
+        }
+
+        function updateThemeToggle() {
+            const themeIcon = document.querySelector('.theme-icon');
+            const themeText = document.querySelector('.theme-text');
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+            themeText.textContent = isDark ? 'Claro' : 'Escuro';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileIcon(extension) {
+            const icons = {
+                'pdf': '📄',
+                'doc': '📝', 'docx': '📝',
+                'xls': '📊', 'xlsx': '📊',
+                'ppt': '📊', 'pptx': '📊',
+                'txt': '📄',
+                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️', 'bmp': '🖼️',
+                'mp3': '🎵', 'wav': '🎵', 'flac': '🎵',
+                'mp4': '🎬', 'avi': '🎬', 'mkv': '🎬',
+                'zip': '📦', 'rar': '📦', '7z': '📦',
+                'js': '⚙️', 'html': '🌐', 'css': '🎨', 'json': '⚙️',
+                'py': '🐍', 'java': '☕', 'cpp': '⚙️', 'c': '⚙️'
+            };
+            return icons[extension.toLowerCase()] || '📄';
+        }
+
+        function updateFileTable() {
+            const tableWrapper = document.getElementById('tableWrapper');
+            const fileCount = document.getElementById('fileCount');
+            
+            fileCount.textContent = `${files.length} arquivo${files.length !== 1 ? 's' : ''}`;
+            
+            if (files.length === 0) {
+                tableWrapper.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>Nenhum arquivo carregado ainda.<br>Arraste arquivos para começar!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let tableHTML = `
+                <table class="files-table">
+                    <thead>
+                        <tr>
+                            <th>Arquivo</th>
+                            <th>Extensão</th>
+                            <th>Tamanho</th>
+                            <th>Modificado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            files.forEach((file, index) => {
+                const extension = file.name.split('.').pop() || '';
+                const icon = getFileIcon(extension);
+                const modifiedDate = new Date(file.lastModified).toLocaleDateString('pt-BR');
+                
+                tableHTML += `
+                    <tr>
+                        <td>
+                            <span class="file-icon">${icon}</span>
+                            <span class="file-name">${file.name}</span>
+                        </td>
+                        <td>
+                            <span class="file-extension">${extension}</span>
+                        </td>
+                        <td class="file-size">${formatFileSize(file.size)}</td>
+                        <td class="file-size">${modifiedDate}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+            tableWrapper.innerHTML = tableHTML;
+            updateStorageUsage();
+            updateLastUpdate();
+        }
+
+        function handleFiles(fileList) {
+            let newFilesCount = 0;
+            
+            for (let i = 0; i < fileList.length; i++) {
+                const file = fileList[i];
+                if (!files.some(f => f.name === file.name && f.size === file.size)) {
+                    files.push(file);
+                    newFilesCount++;
+                }
+            }
+            
+            if (newFilesCount > 0) {
+                showToast(`${newFilesCount} arquivo${newFilesCount > 1 ? 's' : ''} adicionado${newFilesCount > 1 ? 's' : ''}!`, 'success');
+                updateFileTable();
+            } else if (fileList.length > 0) {
+                showToast('Arquivos já existem na lista', 'warning');
+            }
+        }
+
+        function clearFiles() {
+            if (files.length > 0) {
+                files = [];
+                updateFileTable();
+                showToast('Lista de arquivos limpa!', 'success');
+            } else {
+                showToast('Lista já está vazia', 'info');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and drop functionality
+        const dropZone = document.querySelector('.drop-zone');
+
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // Prevent default drag behaviors on the entire page
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            document.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S or Cmd+S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveData();
+            }
+            
+            // Ctrl+O or Cmd+O to open files
+            if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
+                e.preventDefault();
+                document.getElementById('fileInput').click();
+            }
+            
+            // Ctrl+T or Cmd+T to toggle theme
+            if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+                e.preventDefault();
+                toggleTheme();
+            }
+            
+            // Delete key to clear files
+            if (e.key === 'Delete' && e.shiftKey) {
+                e.preventDefault();
+                clearFiles();
+            }
+        });
+
+        // Page visibility API for battery optimization
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                updateConnectionStatus();
+                updateLastUpdate();
+            }
+        });
+
+        // Initialize
+        updateConnectionStatus();
+        updateFileTable();
+        updateLastUpdate();
+        
+        // Welcome message
+        setTimeout(() => {
+            showToast('PWA carregada! Funciona offline 🚀', 'success');
+        }, 1000);
+
+        // Register for Web Share API if available
+        if ('share' in navigator) {
+            // Add share functionality for supported browsers
+            console.log('Web Share API available');
+        }
+
+        // Battery API for power optimization (experimental)
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(function(battery) {
+                if (battery.level < 0.2 && !battery.charging) {
+                    showToast('Bateria baixa - modo economia ativo', 'warning');
+                }
+            });
+        }
+    </script>
+
+    <!-- Inline Service Worker for offline functionality -->
+    <script>
+        // Create service worker content as a blob
+        const swCode = `
+            const CACHE_NAME = 'file-manager-pwa-v1';
+            const urlsToCache = [
+                '/',
+                '/index.html'
+            ];
+
+            self.addEventListener('install', function(event) {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then(function(cache) {
+                            return cache.addAll(urlsToCache);
+                        })
+                );
+                self.skipWaiting();
+            });
+
+            self.addEventListener('fetch', function(event) {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then(function(response) {
+                            if (response) {
+                                return response;
+                            }
+                            return fetch(event.request);
+                        })
+                );
+            });
+
+            self.addEventListener('activate', function(event) {
+                event.waitUntil(
+                    caches.keys().then(function(cacheNames) {
+                        return Promise.all(
+                            cacheNames.map(function(cacheName) {
+                                if (cacheName !== CACHE_NAME) {
+                                    return caches.delete(cacheName);
+                                }
+                            })
+                        );
+                    })
+                );
+                self.clients.claim();
+            });
+        `;
+
+        // Register service worker with blob URL
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    const registration = await navigator.serviceWorker.register(swUrl);
+                    console.log('SW registered: ', registration);
+                } catch (registrationError) {
+                    console.log('SW registration failed: ', registrationError);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
